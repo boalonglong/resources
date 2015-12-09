@@ -18,11 +18,13 @@ set nobackup
 
 set number
 set ruler
+set linebreak
 set textwidth=80
 set expandtab
 set shiftwidth=2
 set tabstop=2
 set softtabstop=2
+set showtabline=2
 set smarttab
 set hlsearch       " highlight the searched items
 set showmatch
