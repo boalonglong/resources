@@ -55,6 +55,7 @@ nmap <leader>w :w!<cr>
 if Mysystem() == "windows"
   map <leader>e :e! $VIM\_vimrc<cr>
   set gfn=Menlo:h14
+  set backspace=indent,eol,start
 else
   map <leader>e :e! ~/.vimrc<cr>
   autocmd! bufwritepost vimrc source ~/.vimrc
