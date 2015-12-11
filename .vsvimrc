@@ -21,6 +21,8 @@ set number
 set ruler
 set linebreak
 set textwidth=80
+highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white 
+match OverLength '\%101v.*' 
 set expandtab
 set shiftwidth=2
 set tabstop=2
@@ -31,10 +33,10 @@ set hlsearch       " highlight the searched items
 set showmatch
 set matchtime=2
 
-set autoindent     " uses the indent from the previous line.
-set smartindent    " like autoindent, but also recognizes some C syntax to increase/reduce the indent.
-set cindent        " configurable to different indenting styles.
-set cinoptions=N-s
+set autoindent
+set smartindent
+set cindent
+set cino=N-s
 set wrap
 set cursorline
 set formatoptions=tcrqn 
@@ -72,12 +74,6 @@ if has("autocmd")
                 \ exe " normal g`\"" | 
                 \ endif 
 endif "has("autocmd") 
-
-if exists('+colorcolumn')
-  set colorcolumn=80
-else
-  au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
-endif
 
 " use space key to turn on/off the fold.
 set foldenable 
