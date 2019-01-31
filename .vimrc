@@ -192,10 +192,10 @@ endif
 
 map <A-g> :cs find g <cword><cr>
 
-execute pathogen#infect()
+" execute pathogen#infect()
 " vundle env settings
 filetype off
-set rtp+=~/.vim/bundle
+set rtp+=~/.vim/bundle/Vundle.vim
 " vundle plugins are all listed between vundle#begin() and vundle#end()
 call vundle#begin()
 " Plugin 'scrooloose/nerdtree'
