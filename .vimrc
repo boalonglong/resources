@@ -1,3 +1,7 @@
+" common settings
+" hi := highlight
+" colo := colorscheme
+"
 " judge platform
 function! Mysystem()
   if has("win32")
@@ -7,26 +11,30 @@ function! Mysystem()
   endif
 endfunction
 
+set tags+=./tags;/;/usr/include/c++/6.3.1/stdcpp.tags
 set nocompatible
+set exrc
+set secure
+set diffopt=iwhite
 
-colorscheme desert
+if &diff
+  colo murphy
+else
+  colo pablo
+endif
+" hi Search guibg=peru guifg=wheat
 
 " set how many lines of history VIM has to remember
-set history=500
-
-" enable filetype plugins
-filetype on
-filetype plugin on
-filetype indent on
+set history=40
 
 " set to auto read when a file is changed outside
 set autoread
 
 " with a map leader, it's possible to do extra key combinations
 " like <leader>w saves the current file
-let mapleader=","
-let g:mapleader=","
-let maplocalleader="\\"
+let mapleader=";"
+let g:mapleader=";"
+" let maplocalleader="\\"
 
 set encoding=utf8
 set fileencodings=utf-8,gbk,gb2312,cp936,usc-bom,euc-jp,gb18030
@@ -41,12 +49,13 @@ set nobackup
 set nowb
 set noswapfile
 
+set nowrap
+
 set number
 " always show current position
 set ruler
 
 set linebreak
-set textwidth=80
 
 " use spaces instead of tabs
 set expandtab
@@ -67,7 +76,7 @@ set autoindent
 " but also recognizes some C syntax to increase/reduce the indent.
 set smartindent    
 set cindent        " configurable to different indenting styles.
-set cinoptions=N-s
+set cino=>2+2(0,W4g1h1N-2
 
 " highlight the searched items
 set hlsearch
@@ -77,46 +86,39 @@ set incsearch
 
 set showmatch
 set matchtime=2
+set wildmenu
 
-set wrap
-set cursorline
+" set wrap
+" set cursorline
 set formatoptions=tcrqn 
 set noerrorbells 
 set linespace=0 
 
-nmap <leader>w :w!<cr>
+syntax enable
+syntax on
 
 " configure backspace so it acts as it should act
 set backspace=indent,eol,start
+mapclear
 
 if Mysystem() == "windows"
-  map <leader>e :e! $VIM\_vimrc<cr>
-  set gfn=Menlo:h14
+  map <leader>e :e! ~\.vimrc<cr>
+  map <leader>u :source ~\.vimrc<cr>
 else
   map <leader>e :e! ~/.vimrc<cr>
+  map <leader>u :source ~\.vimrc<cr>
   autocmd! bufwritepost vimrc source ~/.vimrc
   set gfn=Monospace\ 10
 endif
-
-" smart way to switch between windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-" opens a new tab with the current buffer's path
-map <leader>te :tabe <c-r>=expand("%:p:h")<cr>/
-
-" switch CWD to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
 " use space key to turn on/off the fold.
 set foldenable 
 
 " add a bit extra margin to the left
-set foldcolumn=1
+set foldcolumn=0
+set foldlevel=4
 
-set foldmethod=manual 
+set foldmethod=syntax
 nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR> 
 
 let g:miniBufExplMapWindowNavVim = 1 
@@ -127,9 +129,8 @@ let g:miniBufExplModSelTarget = 1
 " gui setting.
 set guioptions-=T
 set guioptions-=m
-set guifont=Consolas
-
-syntax on
+set guifont=Monospace\ Regular\ 10
+" set guifont=Consolas
 
 " no annoying sound on errors
 set noerrorbells
@@ -149,23 +150,163 @@ func! DeleteTrailingWS()
   exe "normal `z"
 endfunc
 
+
 if has("autocmd") 
-    autocmd FileType xml,html,c,cs,java,perl,shell,bash,cpp,python,vim,php,ruby set number 
-    autocmd FileType xml,html vmap <C-o> <ESC>'<i<!--<ESC>o<ESC>'>o--> 
-    autocmd FileType java,c,cpp,cs vmap <C-o> <ESC>'<o 
-    autocmd FileType html,text,php,vim,c,java,xml,bash,shell,perl,python setlocal textwidth=100 
-    autocmd Filetype html,xml,xsl source $VIMRUNTIME/plugin/closetag.vim 
-    autocmd BufReadPost * 
-                \ if line("'\"") > 0 && line("'\"") <= line("$") | 
-                \ exe " normal g`\"" | 
-                \ endif 
-    autocmd BufWrite *.py,*.c,*.cpp :call DeleteTrailingWS()
-    autocmd BufWrite *.coffee :call DeleteTrailingWS()
+  autocmd FileType xml,html,c,cc,cs,java,perl,shell,bash,cpp,python,vim,php,ruby set number 
+  autocmd FileType c,cc,cpp,java,bash,python
+        \ if exists('+colorcolumn') |
+        \   set colorcolumn=81 |
+        \ else |
+        \   au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1) |
+        \ endif
+  autocmd FileType xml,html vmap <C-o> <ESC>'<i<!--<ESC>o<ESC>'>o--> 
+  autocmd FileType txt set wrap
+  autocmd FileType xml,html set colorcolumn=180
+  autocmd FileType python set colorcolumn=81
+  autocmd FileType tex set colorcolumn=161
+  autocmd FileType java,c,cpp,cs vmap <C-o> <ESC>'<o 
+  autocmd FileType html,text,php,c,java,xml,bash,shell,perl setlocal textwidth=100 
+  autocmd Filetype xsl source $VIMRUNTIME/plugin/closetag.vim 
+  autocmd BufReadPost * 
+        \ if line("'\"") > 0 && line("'\"") <= line("$") | 
+        \ exe " normal g`\"" | 
+        \ endif 
+  autocmd BufWrite *.py,*.c,*.cpp,*.h,*.cc,*.mk,makefile,*.js,*.tex :call DeleteTrailingWS()
+  autocmd BufWrite *.coffee :call DeleteTrailingWS()
 endif "has("autocmd") 
 
-if exists('+colorcolumn')
-  set colorcolumn=80
-else
-  au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+if has('cscope')
+  set cscopetag cscopeverbose
+
+  if has('quickfix')
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
+  endif
+
+  cnoreabbrev csa cs add
+  cnoreabbrev csf cs find
+  cnoreabbrev csk cs kill
+  cnoreabbrev csr cs reset
+  cnoreabbrev css cs show
+  cnoreabbrev csh cs help
 endif
+
+map <A-g> :cs find g <cword><cr>
+
+execute pathogen#infect()
+" vundle env settings
+filetype off
+set rtp+=~/.vim/bundle
+" vundle plugins are all listed between vundle#begin() and vundle#end()
+call vundle#begin()
+" Plugin 'scrooloose/nerdtree'
+Plugin 'c.vim'
+Plugin 'VundleVim/Vundle.vim'
+" Plugin 'Lokaltog/vim-powerline'
+Plugin 'scrooloose/syntastic'
+" Plugin 'lervag/vimtex'
+" Plugin 'majutsushi/tagbar'
+Plugin 'Valloric/YouCompleteMe'
+" Plugin 'rdnetto/YCM-Generator', {'branch': 'stable'}
+" Plugin 'honza/vim-snippets'
+" Plugin 'SirVer/ultisnips'
+" Plugin 'tpope/vim-pathogen'
+" Plugin 'tpope/vim-sensible'
+" Plugin 'tpope/vim-scriptease'
+" Plugin 'octol/vim-cpp-enhanced-highlight'
+" Plugin 'flazz/vim-colorschemes'
+"Plugin 'altercation/vim-colors-solarized'
+" Plugin 'felixhummel/setcolors.vim'
+" Plugin 'tpope/vim-fugitive'
+" Plugin 'bling/vim-airline'
+call vundle#end()
+filetype plugin indent on
+
+set statusline+=%F
+set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 1
+let g:syntastic_c_remove_include_errors = 0
+let g:syntastic_cpp_checkers = ['cpplint']
+let g:syntastic_cpp_cpplint_thres = 2
+let g:syntastic_cpp_cpplint_args = 1
+let g:syntastic_python_checkers = ['pylint']
+let g:ycm_confirm_extra_conf = 0
+" let g:vimtex_compiler_latexmk = {'callback' : 0}
+" " 
+let tagbar_left=1
+nnoremap <leader>lt :TagbarToggle<CR>
+let tagbar_width=32
+let g:tagbar_compact=1
+let g:tagbar_type_cpp = {
+    \ 'kinds' : [
+         \ 'c:classes:0:1',
+         \ 'd:macros:0:1',
+         \ 'e:enumerators:0:0', 
+         \ 'f:functions:0:1',
+         \ 'g:enumeration:0:1',
+         \ 'l:local:0:1',
+         \ 'm:members:0:1',
+         \ 'n:namespaces:0:1',
+         \ 'p:functions_prototypes:0:1',
+         \ 's:structs:0:1',
+         \ 't:typedefs:0:1',
+         \ 'u:unions:0:1',
+         \ 'v:global:0:1',
+         \ 'x:external:0:1'
+     \ ],
+     \ 'sro'        : '::',
+     \ 'kind2scope' : {
+         \ 'g' : 'enum',
+         \ 'n' : 'namespace',
+         \ 'c' : 'class',
+         \ 's' : 'struct',
+         \ 'u' : 'union'
+     \ },
+     \ 'scope2kind' : {
+         \ 'enum'      : 'g',
+         \ 'namespace' : 'n',
+         \ 'class'     : 'c',
+         \ 'struct'    : 's',
+         \ 'union'     : 'u'
+     \ }
+\ }
+
+nmap <leader>y "+y
+nmap <leader>w :w!<cr>
+nmap <leader>x :x<cr>
+nmap <leader>t :tabe %:p:h<cr>
+nmap <leader>s :vs %:p:h<cr>
+nmap <leader>o :sp %:p:h<cr>
+nmap <leader>q :q!<cr>
+nmap <leader>p <alt><tab><f5><alt><tab>
+nmap <leader>k :YcmDiags<cr>
+nmap <leader>c ^i// <esc>
+nmap <leader>n ^3x
+nmap <leader>h :vert help<cr>
+nmap to :TrinityToggleAll<cr>
+" opens a new tab with the current buffer's path
+" map <leader>te :tabe <c-r>=expand("%")<cr>/
+
+" switch CWD to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>:pwd<cr>
+
+vnoremap // y/<C-R>"<CR>
+" copy selected content to clipboard
+vnoremap <leader>y "+y
+" paste copied content from clipboard
+vnoremap <leader>p "+p
+
+" smart way to switch between windows
+nmap <C-=> <C-W>=
+
+set switchbuf=useopen,usetab
+
+" let g:CCTreeCscopeDb = "cscope.out"
+" let g:CCTreeRecursiveDepth = 3
+" let g:CCTreeMinVisibleDepth = 3
+" let g:CCTreeOrientation = "leftabove"
 
