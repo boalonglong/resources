@@ -1,8 +1,3 @@
-" common settings
-" hi := highlight
-" colo := colorscheme
-"
-" judge platform
 function! Mysystem()
   if has("win32")
     return "windows"
@@ -11,137 +6,168 @@ function! Mysystem()
   endif
 endfunction
 
-set tags+=./tags;/;/usr/include/c++/6.3.1/stdcpp.tags
-set nocompatible
-set exrc
-set secure
-set diffopt=iwhite
+"{Mappings
+  let mapleader=";"
+  let g:mapleader=";"
+  nmap <leader>w :w!<cr>
+  if Mysystem() == "windows"
+    map <leader>e :e! ~\.vimrc<cr>
+    map <leader>u :source ~\.vimrc<cr>
+  else
+    map <leader>e :e! ~/.vimrc<cr>
+    map <leader>u :source ~/.vimrc<cr>
+    autocmd! bufwritepost vimrc source ~/.vimrc
+  endif
+  nnoremap <leader>lt :TagbarToggle<CR>
+  nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR> 
+  nmap <leader>y "+y
+  nmap <leader>x :x<cr>
+  nmap <leader>t :tabe %:p:h<cr>
+  nmap <leader>s :vs %:p:h<cr>
+  nmap <leader>q :q!<cr>
+  " smart way to switch between windows
+  nmap to :TrinityToggleAll<cr>
+  vnoremap // y/<C-R>"<CR>
+  " copy selected content to clipboard
+  vnoremap <leader>y "+y
+  " paste copied content from clipboard
+  vnoremap <leader>p "+p
+"}
 
-if &diff
-  colo murphy
-else
-  colo pablo
-endif
-" hi Search guibg=peru guifg=wheat
+"{vundle setup
+  set nocompatible
+  filetype off
+  set rtp+=~/.vim/bundle/Vundle.vim
+  " vundle plugins are all listed between vundle#begin() and vundle#end()
+  call vundle#begin()
+  Plugin 'bling/vim-airline'
+  Plugin 'jaxbot/semantic-highlight.vim'
+  Plugin 'scrooloose/nerdtree'
+  Plugin 'scrooloose/syntastic'
+  Plugin 'VundleVim/Vundle.vim'
+  Plugin 'majutsushi/tagbar'
+  call vundle#end()
+"}
 
-" set how many lines of history VIM has to remember
-set history=40
+"{Basic settings
+  colorscheme PaperColor
+  filetype on
+  filetype plugin indent on
+  highlight CursorLine term=reverse
+  highlight CursorColumn term=reverse
+  let tagbar_left=1
+  let tagbar_width=32
+  let &colorcolumn=join(range(81,999),",")
+  let &colorcolumn="80,".join(range(120,999),",")
+  let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
+  if gitroot != ''
+    let &tags = &tags . ',' . gitroot . '/.git/tags'
+  endif
+  set autochdir
+  set autoindent
+  set autoread  " set to auto read when a file is changed outside
+  set autowrite
+  set autowriteall  "Auto-write all file changes
+  set completeopt=menuone,menu,preview,longest
+  set cindent        " configurable to different indenting styles.
+  set cino=>2+2(0,W4g1h1N-2
+  set confirm                 " Confirm before vim exit
+  set copyindent
+  set cursorcolumn
+  set cursorline
+  " configure backspace so it acts as it should act
+  set backspace=indent,eol,start
+  set dictionary+=/usr/share/dict/words
+  set dictionary+=~/.vim/dict/
+  set diffopt=iwhite
+  set display+=lastline
+  set exrc
+  set encoding=utf-8
+  set fileencodings=utf-8,gbk,utf-16le,cp1252,iso-8859-15,,gb2312,cp936,usc-bom
+  set fileencoding=utf-8
+  set fileformats=unix,dos,mac
+  set fileformat=unix  " set unix as the standard file type
+  set foldmethod=syntax
+  set foldlevel=4
+  set foldlevelstart=99
+  set foldenable  " use space key to turn on/off the fold.
+  set formatoptions+=t
+  if v:version > 703 || v:version == 703 && has("patch541")
+    set formatoptions+=j " Delete comment chars when join comment lines
+  endif
+  set formatoptions-=l " wrap long lines
+  set guioptions=e "only show guitablabel
+  set guifont=Monospace\ Regular\ 10
+  set hidden
+  set history=1000  " set how many lines of history VIM has to remember
+  set hlsearch  " highlight the searched items
+  set incsearch  " makes search act like search in modern browsers
+  set ignorecase
+  set iskeyword-=_,.,=,-,:,
+  set laststatus=2  " always show statusline
+  set lazyredraw  " don't update the display while executing macros
+  set linespace=0 
+  set nobackup  " turn backup off, since most stuff is in SVN, git et.c anyway
+  set noerrorbells
+  set nomodeline                  " disable mode lines (security measure)
+  set nospell
+  set noswapfile
+  set nowrap
+  set nowritebackup
+  set number
+  set ruler " always show current position
+  if !&scrolloff
+    set scrolloff=1  " Minimum lines to keep above and below cursor
+  endif
+  if !&sidescrolloff
+    set scrolloff=5
+  endif
+  set shortmess+=filmnrxoOtT  " Abbrev. of messages (avoids 'hit enter')
+  set showcmd  " Show partial commands in status line and
+  set showmatch
+  set showmode  " Display current mode
+  set showtabline=2
+  set smartcase
+  set smartindent    
+  set smarttab
+  set switchbuf=useopen  " reveal already opened files from the quickfix
+                         " window instead of opening new buffers, options: usetab
+  set tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  set tags+=./.tags;/;/usr/include/c++/6.3.1/stdcpp.tags
+  set textwidth=80
+  set timeoutlen=500
+  set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
+  set virtualedit=onemore  " used with caution of breaking plugins
+  set novisualbell
+  set whichwrap=b,s,h,l,<,>,>h,[,]   " Backspace and cursor keys wrap too
+  set wildignore=*.o,*~,*.pyc,*.swp,*.bak,*.class
+  set wildmenu
+  set wildmode=list:longest,full
+  set wrapmargin=2  " 2 chars wrap margin from the right window border, hard wrap
+  if has('syntax')
+    syntax enable
+  endif
+"}
 
-" set to auto read when a file is changed outside
-set autoread
-
-" with a map leader, it's possible to do extra key combinations
-" like <leader>w saves the current file
-let mapleader=";"
-let g:mapleader=";"
-" let maplocalleader="\\"
-
-set encoding=utf8
-set fileencodings=utf-8,gbk,gb2312,cp936,usc-bom,euc-jp,gb18030
-set fileencoding=utf-8
-
-" set unix as the standard file type
-set fileformat=unix
-set fileformats=unix,dos,mac
-
-" turn backup off, since most stuff is in SVN, git et.c anyway
-set nobackup
-set nowb
-set noswapfile
-
-set nowrap
-
-set number
-" always show current position
-set ruler
-
-set linebreak
-
-" use spaces instead of tabs
-set expandtab
-
-" be smart when using tabs
-set smarttab
-
-" 1 tab == 2 spaces
-set shiftwidth=2
-set tabstop=2
-set softtabstop=2
-set showtabline=2
-
-" uses the indent from the previous line.
-set autoindent
-
-" like autoindent, 
-" but also recognizes some C syntax to increase/reduce the indent.
-set smartindent    
-set cindent        " configurable to different indenting styles.
-set cino=>2+2(0,W4g1h1N-2
-
-" highlight the searched items
-set hlsearch
-
-" makes search act like search in modern browsers
-set incsearch
-
-set showmatch
-set matchtime=2
-set wildmenu
-
-" set wrap
-" set cursorline
-set formatoptions=tcrqn 
-set noerrorbells 
-set linespace=0 
-
-syntax enable
-syntax on
-
-" configure backspace so it acts as it should act
-set backspace=indent,eol,start
-mapclear
-
-if Mysystem() == "windows"
-  map <leader>e :e! ~\.vimrc<cr>
-  map <leader>u :source ~\.vimrc<cr>
-else
-  map <leader>e :e! ~/.vimrc<cr>
-  map <leader>u :source ~\.vimrc<cr>
-  autocmd! bufwritepost vimrc source ~/.vimrc
-  set gfn=Monospace\ 10
-endif
-
-" use space key to turn on/off the fold.
-set foldenable 
-
-" add a bit extra margin to the left
-set foldcolumn=0
-set foldlevel=4
-
-set foldmethod=syntax
-nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR> 
-
-let g:miniBufExplMapWindowNavVim = 1 
-let g:miniBufExplMapWindowNavArrows = 1 
-let g:miniBufExplMapCTabSwitchBufs = 1 
-let g:miniBufExplModSelTarget = 1
-
-" gui setting.
-set guioptions-=T
-set guioptions-=m
-set guifont=Monospace\ Regular\ 10
-" set guifont=Consolas
-
-" no annoying sound on errors
-set noerrorbells
-set novisualbell
-set tm=500
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Editing mappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Remap VIM 0 to first non-blank character
-map 0 ^
+"{Plugin settings
+  "{scrooloose/syntastic
+  let g:syntastic_always_populate_loc_list = 1
+  let g:syntastic_auto_loc_list = 1
+  let g:syntastic_c_remove_include_errors = 0
+  let g:syntastic_check_on_open = 1
+  let g:syntastic_check_on_wq = 1
+  let g:syntastic_cpp_checkers = ['cpplint']
+  let g:syntastic_cpp_cpplint_thres = 2
+  let g:syntastic_cpp_cpplint_args = 1
+  let g:syntastic_enable_signs=1
+  let g:syntastic_aggregate_errors=1
+  let g:syntastic_error_symbol="E"
+  let g:syntastic_warning_symbol="W"
+  let g:syntastic_shell_checkers = ['shellcheck']
+  let g:syntastic_python_checkers = ['pylint']
+  highlight SyntasticError guibg=#2F0000
+  "}
+"}
 
 " Delete trailing white space on save, useful for Python and CoffeeScript ;)
 func! DeleteTrailingWS()
@@ -149,7 +175,6 @@ func! DeleteTrailingWS()
   %s/\s\+$//ge
   exe "normal `z"
 endfunc
-
 
 if has("autocmd") 
   autocmd FileType xml,html,c,cc,cs,java,perl,shell,bash,cpp,python,vim,php,ruby set number 
@@ -159,9 +184,7 @@ if has("autocmd")
         \ else |
         \   au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1) |
         \ endif
-  autocmd FileType xml,html vmap <C-o> <ESC>'<i<!--<ESC>o<ESC>'>o--> 
   autocmd FileType txt set wrap
-  autocmd FileType xml,html set colorcolumn=180
   autocmd FileType python set colorcolumn=81
   autocmd FileType tex set colorcolumn=161
   autocmd FileType java,c,cpp,cs vmap <C-o> <ESC>'<o 
@@ -190,56 +213,9 @@ if has('cscope')
   cnoreabbrev csh cs help
 endif
 
-map <A-g> :cs find g <cword><cr>
-
-" execute pathogen#infect()
-" vundle env settings
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-" vundle plugins are all listed between vundle#begin() and vundle#end()
-call vundle#begin()
-" Plugin 'scrooloose/nerdtree'
-Plugin 'c.vim'
-Plugin 'VundleVim/Vundle.vim'
-" Plugin 'Lokaltog/vim-powerline'
-Plugin 'scrooloose/syntastic'
-" Plugin 'lervag/vimtex'
-" Plugin 'majutsushi/tagbar'
-Plugin 'Valloric/YouCompleteMe'
-" Plugin 'rdnetto/YCM-Generator', {'branch': 'stable'}
-" Plugin 'honza/vim-snippets'
-" Plugin 'SirVer/ultisnips'
-" Plugin 'tpope/vim-pathogen'
-" Plugin 'tpope/vim-sensible'
-" Plugin 'tpope/vim-scriptease'
-" Plugin 'octol/vim-cpp-enhanced-highlight'
-" Plugin 'flazz/vim-colorschemes'
-"Plugin 'altercation/vim-colors-solarized'
-" Plugin 'felixhummel/setcolors.vim'
-" Plugin 'tpope/vim-fugitive'
-" Plugin 'bling/vim-airline'
-call vundle#end()
-filetype plugin indent on
-
-set statusline+=%F
-set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 1
-let g:syntastic_c_remove_include_errors = 0
-let g:syntastic_cpp_checkers = ['cpplint']
-let g:syntastic_cpp_cpplint_thres = 2
-let g:syntastic_cpp_cpplint_args = 1
-let g:syntastic_python_checkers = ['pylint']
 let g:ycm_confirm_extra_conf = 0
 " let g:vimtex_compiler_latexmk = {'callback' : 0}
 " " 
-let tagbar_left=1
-nnoremap <leader>lt :TagbarToggle<CR>
-let tagbar_width=32
 let g:tagbar_compact=1
 let g:tagbar_type_cpp = {
     \ 'kinds' : [
@@ -274,39 +250,4 @@ let g:tagbar_type_cpp = {
          \ 'union'     : 'u'
      \ }
 \ }
-
-nmap <leader>y "+y
-nmap <leader>w :w!<cr>
-nmap <leader>x :x<cr>
-nmap <leader>t :tabe %:p:h<cr>
-nmap <leader>s :vs %:p:h<cr>
-nmap <leader>o :sp %:p:h<cr>
-nmap <leader>q :q!<cr>
-nmap <leader>p <alt><tab><f5><alt><tab>
-nmap <leader>k :YcmDiags<cr>
-nmap <leader>c ^i// <esc>
-nmap <leader>n ^3x
-nmap <leader>h :vert help<cr>
-nmap to :TrinityToggleAll<cr>
-" opens a new tab with the current buffer's path
-" map <leader>te :tabe <c-r>=expand("%")<cr>/
-
-" switch CWD to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>:pwd<cr>
-
-vnoremap // y/<C-R>"<CR>
-" copy selected content to clipboard
-vnoremap <leader>y "+y
-" paste copied content from clipboard
-vnoremap <leader>p "+p
-
-" smart way to switch between windows
-nmap <C-=> <C-W>=
-
-set switchbuf=useopen,usetab
-
-" let g:CCTreeCscopeDb = "cscope.out"
-" let g:CCTreeRecursiveDepth = 3
-" let g:CCTreeMinVisibleDepth = 3
-" let g:CCTreeOrientation = "leftabove"
 
