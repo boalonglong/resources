@@ -9,7 +9,7 @@ endfunction
 "{Mappings
   let mapleader=";"
   let g:mapleader=";"
-  nmap <leader>w :w!<cr>
+  nnoremap <leader>w :w!<cr>
   if Mysystem() == "windows"
     map <leader>e :e! ~\.vimrc<cr>
     map <leader>u :source ~\.vimrc<cr>
@@ -18,16 +18,17 @@ endfunction
     map <leader>u :source ~/.vimrc<cr>
     autocmd! bufwritepost vimrc source ~/.vimrc
   endif
-  nnoremap <leader>lt :TagbarToggle<CR>
-  nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR> 
-  nmap <leader>y "+y
-  nmap <leader>x :x<cr>
-  nmap <leader>t :tabe %:p:h<cr>
-  nmap <leader>s :vs %:p:h<cr>
-  nmap <leader>q :q!<cr>
+  nnoremap <leader>t :TagbarToggle<cr>
+  nnoremap <leader>l :NERDTree<cr>
+  nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<cr> 
+  nnoremap <leader>y "+y
+  nnoremap <leader>x :x<cr>
+  nnoremap <leader>o :tabe %:p:h<cr>
+  nnoremap <leader>s :vs %:p:h<cr>
+  nnoremap <leader>q :q!<cr>
   " smart way to switch between windows
-  nmap to :TrinityToggleAll<cr>
-  vnoremap // y/<C-R>"<CR>
+  " nmap to :TrinityToggleAll<cr>
+  vnoremap // y/<C-R>"<cr>
   " copy selected content to clipboard
   vnoremap <leader>y "+y
   " paste copied content from clipboard
@@ -46,11 +47,18 @@ endfunction
   Plugin 'scrooloose/syntastic'
   Plugin 'VundleVim/Vundle.vim'
   Plugin 'majutsushi/tagbar'
+  Plugin 'Valloric/YouCompleteMe'
   call vundle#end()
 "}
 
 "{Basic settings
+if has("gui_running")
+  colorscheme colorsbox-stnight
+  set guioptions=e "only show guitablabel
+  " set guifont=Monospace\ Regular\ 10
+else
   colorscheme PaperColor
+endif
   filetype on
   filetype plugin indent on
   highlight CursorLine term=reverse
@@ -59,15 +67,16 @@ endfunction
   let tagbar_width=32
   let &colorcolumn=join(range(81,999),",")
   let &colorcolumn="80,".join(range(120,999),",")
-  let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
-  if gitroot != ''
-    let &tags = &tags . ',' . gitroot . '/.git/tags'
-  endif
+  " let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
+  " if gitroot != ''
+  "   let &tags = &tags . ',' . gitroot . '/.git/tags'
+  " endif
   set autochdir
   set autoindent
   set autoread  " set to auto read when a file is changed outside
   set autowrite
   set autowriteall  "Auto-write all file changes
+  set background=dark
   set completeopt=menuone,menu,preview,longest
   set cindent        " configurable to different indenting styles.
   set cino=>2+2(0,W4g1h1N-2
@@ -87,7 +96,7 @@ endfunction
   set fileencoding=utf-8
   set fileformats=unix,dos,mac
   set fileformat=unix  " set unix as the standard file type
-  set foldmethod=syntax
+  set foldmethod=indent  " optional: syntax
   set foldlevel=4
   set foldlevelstart=99
   set foldenable  " use space key to turn on/off the fold.
@@ -96,13 +105,11 @@ endfunction
     set formatoptions+=j " Delete comment chars when join comment lines
   endif
   set formatoptions-=l " wrap long lines
-  set guioptions=e "only show guitablabel
-  set guifont=Monospace\ Regular\ 10
   set hidden
   set history=1000  " set how many lines of history VIM has to remember
   set hlsearch  " highlight the searched items
   set incsearch  " makes search act like search in modern browsers
-  set ignorecase
+  " set ignorecase
   set iskeyword-=_,.,=,-,:,
   set laststatus=2  " always show statusline
   set lazyredraw  " don't update the display while executing macros
@@ -151,6 +158,7 @@ endfunction
 
 "{Plugin settings
   "{scrooloose/syntastic
+  let g:syntastic_aggregate_errors=1
   let g:syntastic_always_populate_loc_list = 1
   let g:syntastic_auto_loc_list = 1
   let g:syntastic_c_remove_include_errors = 0
@@ -160,14 +168,87 @@ endfunction
   let g:syntastic_cpp_cpplint_thres = 2
   let g:syntastic_cpp_cpplint_args = 1
   let g:syntastic_enable_signs=1
-  let g:syntastic_aggregate_errors=1
   let g:syntastic_error_symbol="E"
-  let g:syntastic_warning_symbol="W"
-  let g:syntastic_shell_checkers = ['shellcheck']
   let g:syntastic_python_checkers = ['pylint']
+  let g:syntastic_shell_checkers = ['shellcheck']
+  let g:syntastic_warning_symbol="W"
   highlight SyntasticError guibg=#2F0000
   "}
-"}
+  "{majutsushi/tagbar
+  let g:tagbar_compact=1
+  let g:tagbar_type_cpp = {
+        \ 'kinds' : [
+        \ 'c:classes:0:1',
+        \ 'd:macros:0:1',
+        \ 'e:enumerators:0:0', 
+        \ 'f:functions:0:1',
+        \ 'g:enumeration:0:1',
+        \ 'l:local:0:1',
+        \ 'm:members:0:1',
+        \ 'n:namespaces:0:1',
+        \ 'p:functions_prototypes:0:1',
+        \ 's:structs:0:1',
+        \ 't:typedefs:0:1',
+        \ 'u:unions:0:1',
+        \ 'v:global:0:1',
+        \ 'x:external:0:1'
+        \ ],
+        \ 'sro'        : '::',
+        \ 'kind2scope' : {
+        \ 'g' : 'enum',
+        \ 'n' : 'namespace',
+        \ 'c' : 'class',
+        \ 's' : 'struct',
+        \ 'u' : 'union'
+        \ },
+        \ 'scope2kind' : {
+        \ 'enum'      : 'g',
+        \ 'namespace' : 'n',
+        \ 'class'     : 'c',
+        \ 'struct'    : 's',
+        \ 'union'     : 'u'
+        \ }
+        \ }
+  "}
+  "{YouCompleteMe
+    let g:ycm_min_num_of_chars_for_completion = 3
+    let g:ycm_autoclose_preview_window_after_completion=1
+    let g:ycm_complete_in_comments = 1
+    "leave '<tab>', '<c-j>' for ultisnips
+    let g:ycm_key_list_select_completion = ['<c-n>', '<Down>']
+    "leave '<s-tab>', '<c-k>' for ultisnips
+    let g:ycm_key_list_previous_completion = ['<c-p>', '<Up>']
+    let g:ycm_confirm_extra_conf = 0
+    let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/.ycm_extra_conf.py'
+    " http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
+    let g:ycm_key_list_select_completion=[]
+    let g:ycm_key_list_previous_completion=[]
+    let g:ycm_filetype_blacklist = {
+          \ 'tagbar' : 1,
+          \ 'qf' : 1,
+          \ 'notes' : 1,
+          \ 'markdown' : 1,
+          \ 'unite' : 1,
+          \ 'text' : 1,
+          \ 'vimwiki' : 1,
+          \ 'pandoc' : 1,
+          \ 'infolog' : 1,
+          \ 'mail' : 1
+          \}
+    let g:ycm_semantic_triggers =  {
+          \ 'c' : ['->', '.'],
+          \ 'objc' : ['->', '.'],
+          \ 'ocaml' : ['.', '#'],
+          \ 'cpp,objcpp' : ['->', '.', '::'],
+          \ 'perl' : ['->'],
+          \ 'php' : ['->', '::'],
+          \ 'cs,java,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+          \ 'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
+          \ 'ruby' : ['.', '::'],
+          \ 'lua' : ['.', ':'],
+          \ 'erlang' : [':'],
+          \}
+  "}
 
 " Delete trailing white space on save, useful for Python and CoffeeScript ;)
 func! DeleteTrailingWS()
@@ -212,42 +293,4 @@ if has('cscope')
   cnoreabbrev css cs show
   cnoreabbrev csh cs help
 endif
-
-let g:ycm_confirm_extra_conf = 0
-" let g:vimtex_compiler_latexmk = {'callback' : 0}
-" " 
-let g:tagbar_compact=1
-let g:tagbar_type_cpp = {
-    \ 'kinds' : [
-         \ 'c:classes:0:1',
-         \ 'd:macros:0:1',
-         \ 'e:enumerators:0:0', 
-         \ 'f:functions:0:1',
-         \ 'g:enumeration:0:1',
-         \ 'l:local:0:1',
-         \ 'm:members:0:1',
-         \ 'n:namespaces:0:1',
-         \ 'p:functions_prototypes:0:1',
-         \ 's:structs:0:1',
-         \ 't:typedefs:0:1',
-         \ 'u:unions:0:1',
-         \ 'v:global:0:1',
-         \ 'x:external:0:1'
-     \ ],
-     \ 'sro'        : '::',
-     \ 'kind2scope' : {
-         \ 'g' : 'enum',
-         \ 'n' : 'namespace',
-         \ 'c' : 'class',
-         \ 's' : 'struct',
-         \ 'u' : 'union'
-     \ },
-     \ 'scope2kind' : {
-         \ 'enum'      : 'g',
-         \ 'namespace' : 'n',
-         \ 'class'     : 'c',
-         \ 'struct'    : 's',
-         \ 'union'     : 'u'
-     \ }
-\ }
 
